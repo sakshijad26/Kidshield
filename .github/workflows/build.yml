@@ -18,12 +18,11 @@ jobs:
         with:
           node-version: '18'
 
-      # Install and build Backend
-      - name: Install and Build Backend
+      # Install Backend
+      - name: Install Backend Dependencies
         working-directory: backend
         run: |
           npm install
-          npm run build
 
       # Install and build Frontend
       - name: Install and Build Frontend
@@ -31,5 +30,3 @@ jobs:
         run: |
           npm install
           npm run build
-
-      # Admin build step is skipped because it has no package.json

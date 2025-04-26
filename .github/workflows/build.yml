@@ -1,47 +1,37 @@
-name: Fullstack Build and Test
+name: Build Project
 
 on:
   push:
-    branches:
-      - main
-      - develop
+    branches: [main]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [main]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Install and build Backend
-      working-directory: backend
-      run: |
-        npm install
-        npm run build || echo "No build script for backend"
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
 
-    - name: Install and build Admin
-      working-directory: admin
-      run: |
-        npm install
-        npm run build
+      - name: Build admin panel
+        run: |
+          cd admin
+          npm install
+          npm run build
 
-    - name: Install and build Frontend
-      working-directory: frontend
-      run: |
-        npm install
-        npm run build
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install

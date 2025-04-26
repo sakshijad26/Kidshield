@@ -1,37 +1,35 @@
-name: Build Project
+name: Build and Deploy
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '18'
 
-      - name: Build frontend
+      # Install and build Backend
+      - name: Install and Build Backend
+        working-directory: backend
         run: |
-          cd frontend
           npm install
           npm run build
 
-      - name: Build admin panel
+      # Install and build Frontend
+      - name: Install and Build Frontend
+        working-directory: frontend
         run: |
-          cd admin
           npm install
           npm run build
 
-      - name: Install backend dependencies
-        run: |
-          cd backend
-          npm install
+      # Admin build step is skipped because it has no package.json

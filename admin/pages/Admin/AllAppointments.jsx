@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import { AdminContext } from '../../context/AdminContext'
 import { AppContext } from '../../context/AppContext'
 
-const AllAppointments = () => {
+const AllAppointmgitents = () => {
   const { aToken, appointments, cancelAppointment, getAllAppointments } = useContext(AdminContext)
   const { slotDateFormat, calculateAge, currency } = useContext(AppContext)
 

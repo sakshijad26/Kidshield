@@ -10,9 +10,14 @@ import Appointment from './pages/Appointment'
 import MyAppointments from './pages/MyAppointments'
 import MyProfile from './pages/MyProfile'
 import Footer from './components/Footer'
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import Verify from './pages/Verify'
+import VaccineCertificate from './components/VaccineCertificate'
+import ChildVaccineDashboard from './components/ChildVaccineDashboard'
+
+// ✅ Missing import (added now)
+import ChildVaccinationRecords from './pages/ChildVaccinationRecords'
 
 const App = () => {
   return (
@@ -30,6 +35,9 @@ const App = () => {
         <Route path='/my-appointments' element={<MyAppointments />} />
         <Route path='/my-profile' element={<MyProfile />} />
         <Route path='/verify' element={<Verify />} />
+        <Route path='/child-dashboard' element={<ChildVaccineDashboard />} />
+        <Route path='/vaccine-certificate' element={<VaccineCertificate />} />
+        <Route path='/vaccination-records/:childId?' element={<ChildVaccinationRecords />} />
       </Routes>
       <Footer />
     </div>

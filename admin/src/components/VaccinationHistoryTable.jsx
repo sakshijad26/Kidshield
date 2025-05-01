@@ -38,7 +38,7 @@ const VaccinationHistoryTable = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doctor</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+           {/*   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th> */}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -69,7 +69,7 @@ const VaccinationHistoryTable = () => {
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {record.notes || '-'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+               {/* <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   {record.status !== 'completed' && (
                     <button
                       onClick={() => handleStatusUpdate(record._id, 'completed')}
@@ -87,6 +87,7 @@ const VaccinationHistoryTable = () => {
                     </button>
                   )}
                 </td>
+               */}
               </tr>
             ))}
           </tbody>

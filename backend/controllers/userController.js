@@ -9,6 +9,7 @@ import stripe from "stripe";
 import razorpay from 'razorpay';
 import adharModel from "../models/adharModel.js"; // add this line
 import vaccineModel from '../models/vaccineModel.js'
+import vaccineRecordModel from '../models/vaccineRecordModel.js'; 
 
 
 // Gateway Initialize
@@ -406,6 +407,61 @@ const verifyStripe = async (req, res) => {
 
 }
 
+const getChildData = async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const { childId } = req.params;
+      
+      // If childId is provided, fetch that specific child
+      // Otherwise fetch the child associated with the user's Aadhaar
+      const userData = await userModel.findById(userId).select('-password');
+      
+      if (!userData) {
+        return res.json({ success: false, message: 'User not found' });
+      }
+      
+      // Get child data from Aadhaar database or another source
+      const childData = childId 
+        ? await adharModel.findById(childId)
+        : await adharModel.findOne({ aadhaar: userData.adharNumber });
+      
+      if (!childData) {
+        return res.json({ success: false, message: 'Child data not found' });
+      }
+      
+      res.json({ success: true, childData });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false, message: error.message });
+    }
+  }
+
+  // In userController.js
+const getVaccinationRecords = async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const { childId } = req.params;
+      
+      const userData = await userModel.findById(userId).select('-password');
+      
+      if (!userData) {
+        return res.json({ success: false, message: 'User not found' });
+      }
+      
+      // Query by childId if provided, otherwise by user's Aadhaar
+      const query = childId 
+        ? { childId }
+        : { aadharNumber: userData.adharNumber };
+      
+      const records = await vaccineRecordModel.find(query).sort({ date: -1 });
+      
+      res.json({ success: true, records });
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false, message: error.message });
+    }
+  }
+
 export {
     loginUser,
     registerUser,
@@ -418,5 +474,7 @@ export {
     verifyRazorpay,
     paymentStripe,
     getVaccinesByDoctor,
+    getChildData,
+    getVaccinationRecords,
     verifyStripe
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { DoctorContext } from '../context/DoctorContext';
 
 const AddVaccinationRecord = () => {
@@ -9,23 +9,24 @@ const AddVaccinationRecord = () => {
   const [notes, setNotes] = useState('');
   const [fetchingVaccines, setFetchingVaccines] = useState(false);
 
-  useEffect(() => {
-    const loadVaccines = async () => {
-      try {
-        setFetchingVaccines(true);
-        const vaccinesList = await getVaccines();
-        setVaccines(vaccinesList || []);
-      } catch (error) {
-        console.error("Failed to fetch vaccines:", error);
-      } finally {
-        setFetchingVaccines(false);
-      }
-    };
+  // Memoized vaccine loader
+  const loadVaccines = useCallback(async () => {
+    setFetchingVaccines(true);
+    try {
+      const vaccinesList = await getVaccines();
+      setVaccines(vaccinesList || []);
+    } catch (error) {
+      console.error("Failed to fetch vaccines:", error);
+    } finally {
+      setFetchingVaccines(false);
+    }
+  }, [getVaccines]);
 
-    if (childData) {
+  useEffect(() => {
+    if (childData && vaccines.length === 0) {
       loadVaccines();
     }
-  }, [childData, getVaccines]);
+  }, [childData, loadVaccines, vaccines.length]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +43,6 @@ const AddVaccinationRecord = () => {
 
     const success = await addVaccinationRecord(recordData);
     if (success) {
-      // Reset form
       setSelectedVaccine('');
       setStatus('scheduled');
       setNotes('');
@@ -55,32 +55,41 @@ const AddVaccinationRecord = () => {
     <div className="bg-white p-4 rounded border mb-5">
       <h2 className="text-lg font-medium mb-3">Add Vaccination Record</h2>
       <form onSubmit={handleSubmit}>
+        {/* Vaccine Dropdown */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="vaccine">
             Vaccine
           </label>
-          <select
-            id="vaccine"
-            value={selectedVaccine}
-            onChange={(e) => setSelectedVaccine(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-            disabled={fetchingVaccines}
-          >
-            <option value="">
-              {fetchingVaccines ? 'Loading vaccines...' : 'Select a vaccine'}
-            </option>
-            {vaccines.map((vaccine) => (
-              <option key={vaccine._id} value={vaccine._id}>
-                {vaccine.name} - {vaccine.category}
+          <div className="relative">
+            <select
+              id="vaccine"
+              value={selectedVaccine}
+              onChange={(e) => setSelectedVaccine(e.target.value)}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              required
+              disabled={fetchingVaccines}
+            >
+              <option value="">
+                {fetchingVaccines ? 'Loading vaccines...' : 'Select a vaccine'}
               </option>
-            ))}
-          </select>
+              {vaccines.map((vaccine) => (
+                <option key={vaccine._id} value={vaccine._id}>
+                  {vaccine.name} - {vaccine.category}
+                </option>
+              ))}
+            </select>
+            {fetchingVaccines && (
+              <span className="absolute right-3 top-2 text-gray-500 text-xs">Loading...</span>
+            )}
+          </div>
           {vaccines.length === 0 && !fetchingVaccines && (
-            <p className="text-red-500 text-xs italic mt-1">No vaccines available. Please ensure vaccines are added to the system.</p>
+            <p className="text-red-500 text-xs italic mt-1">
+              No vaccines available. Please ensure vaccines are added to the system.
+            </p>
           )}
         </div>
 
+        {/* Status Dropdown */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="status">
             Status
@@ -97,6 +106,7 @@ const AddVaccinationRecord = () => {
           </select>
         </div>
 
+        {/* Notes */}
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="notes">
             Notes (Optional)
@@ -107,9 +117,10 @@ const AddVaccinationRecord = () => {
             onChange={(e) => setNotes(e.target.value)}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             rows="3"
-          ></textarea>
+          />
         </div>
 
+        {/* Submit Button */}
         <div className="flex items-center justify-end">
           <button
             type="submit"
